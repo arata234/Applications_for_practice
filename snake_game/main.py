@@ -6,6 +6,7 @@ import time
 
 EAT_DISTANCE = 15
 
+
 if __name__ == "__main__":
     screen = Screen()
     screen.setup(width=600, height=600)
@@ -36,12 +37,12 @@ if __name__ == "__main__":
             print("nom nom nom")
             
         if snake.head.xcor() > 280 or snake.head.xcor() < -280 or snake.head.ycor() > 280 or snake.head.ycor() < -280:
-            game_is_on = False
-            scoreboard.game_over()
+            scoreboard.reset()
+            snake.reset()
             
         for segment in snake.segments[1:]:
             if snake.head.distance(segment) < 10:
-                game_is_on = False
-                scoreboard.game_over()
-                
+                scoreboard.reset()
+                snake.reset()
+
     screen.exitonclick()
