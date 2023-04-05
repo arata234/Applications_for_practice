@@ -1,5 +1,5 @@
 from tkinter import *
-
+import json
 
 
 # generate random password
@@ -10,9 +10,13 @@ def generate_password():
 def save_password():
     data = {f"{website_entry.get()}": 
         {"ID": ID_entry.get(), "password": password_entry.get()}}
-    for k, v in data.items():
-        print(k, v)
-
+    
+    with open("./tkinter_tutorial/password.json") as f:
+        d = json.load(f)
+        d.update(data)
+    
+    with open("./tkinter_tutorial/password.json", "w") as f:
+        json.dump(d, f)
 
 window = Tk()
 window.title("Password Manager")
