@@ -12,8 +12,8 @@ all_column = [i for i in range(-90, 90, 20)]
 all_row = [i for i in range(-190, 210, 20)]
 
 def fast_down():
-    global TIME_SLEEP
-    TIME_SLEEP = 0
+    global tm
+    tm = 0
 
 def vanish_row(exist_list):
     vanish_row_dict = {}
@@ -52,10 +52,12 @@ if __name__ == "__main__":
     screen.onkey(block.rotate, "r")
     
     game_is_on = True
+    tm = TIME_SLEEP
     c = 0
+    
     while game_is_on:
         screen.update()
-        time.sleep(TIME_SLEEP)
+        time.sleep(tm)
         if c % 2 == 0:
             block.fall()
         # print([b.position() for b in block.blocks])
@@ -67,7 +69,7 @@ if __name__ == "__main__":
             screen.update()
             block.shape = random.choice(SHAPE)
             block.generate_block(block.shape)
-            TIME_SLEEP = 0.25
+            tm = TIME_SLEEP
             
         elif any([abs(e.ycor() - b.ycor()) == 20 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in exist_blocks]):
             exist_blocks.extend(block.blocks)
@@ -76,7 +78,7 @@ if __name__ == "__main__":
             # print(set(i.position() for i in exist_blocks))
             block.shape = random.choice(SHAPE)
             block.generate_block(block.shape)
-            TIME_SLEEP = 0.25
+            tm = TIME_SLEEP
         
         if any(i.ycor() >= 230 for i in exist_blocks):
             game_is_on = False
