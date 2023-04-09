@@ -90,7 +90,7 @@ class Block(object):
             block.forward(20)
     
     def left(self):
-        if all([block.xcor() > -90  for block in self.blocks]):
+        if all([block.xcor() >= -80  for block in self.blocks]):
             for block in self.blocks:
                 block.goto(block.xcor()-20, block.ycor())
 
