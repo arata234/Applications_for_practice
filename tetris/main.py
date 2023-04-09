@@ -32,6 +32,14 @@ def vanish_row(exist_list):
                 if block.ycor() > y:
                     block.forward(20)
 
+def beside_block(current_blocks, exist_list):
+    position_list = [block.position() for block in exist_list]
+    current_blocks_position_list = [block.position() for block in current_blocks]
+    if any([abs(c[0] - p[0]) < 5 and abs(c[1] - p[1]) < 5 for c in current_blocks_position_list for p in position_list]):
+        return True
+
+
+
 if __name__ == "__main__":
     screen = Screen()
     screen.setup(width=400, height=600)
@@ -42,9 +50,10 @@ if __name__ == "__main__":
     
     wall = wall.Wall()
     block = block.Block()
-    
+
     exist_blocks = []
-    
+    walls = wall.walls
+
     screen.listen()
     screen.onkey(block.left, "a")
     screen.onkey(block.right, "d")
@@ -54,7 +63,7 @@ if __name__ == "__main__":
     game_is_on = True
     tm = TIME_SLEEP
     c = 0
-    
+    trace_pos_list = []
     while game_is_on:
         screen.update()
         time.sleep(tm)
@@ -62,24 +71,46 @@ if __name__ == "__main__":
             block.fall()
         # print([b.position() for b in block.blocks])
         # print([b.ycor() for b in block.blocks])
-        
-        if any([b.ycor() == -190.0 for b in block.blocks]):
-            exist_blocks.extend(block.blocks)
-            block.remove_block()
-            screen.update()
-            block.shape = random.choice(SHAPE)
-            block.generate_block(block.shape)
-            tm = TIME_SLEEP
+            trace_pos_list.append([b.position() for b in block.blocks]) 
             
-        elif any([abs(e.ycor() - b.ycor()) == 20 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in exist_blocks]):
-            exist_blocks.extend(block.blocks)
-            block.remove_block()
-            screen.update()
-            # print(set(i.position() for i in exist_blocks))
-            block.shape = random.choice(SHAPE)
-            block.generate_block(block.shape)
-            tm = TIME_SLEEP
+        if any([b.ycor() - e.ycor() == 20 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in exist_blocks]) or\
+              any([b.ycor() - e.ycor() == 20 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in walls]):
+            start = time.time()
+
+            while time.time() - start < 1.0:
+                screen.update()
+                if beside_block(block.blocks, exist_blocks):
+                    for i, b in enumerate(block.blocks):
+                        b.goto(trace_pos_list[-1][i])  
+                trace_pos_list.append([b.position() for b in block.blocks])
+
+            if any([b.ycor() - e.ycor() == 20 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in walls]):
+                exist_blocks.extend(block.blocks)
+                trace_pos_list = []
+                block.remove_block()
+                screen.update()
+                # print(set(i.position() for i in exist_blocks))
+                block.shape = random.choice(SHAPE)
+                block.generate_block(block.shape)
+                tm = TIME_SLEEP
+
+            if not any([abs(b.ycor() - e.ycor()) < 5 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in exist_blocks]):
+                if any([b.ycor() - e.ycor() == 20 and abs(e.xcor() - b.xcor()) < 5 for b in block.blocks for e in exist_blocks]):
+                    exist_blocks.extend(block.blocks)
+                    trace_pos_list = []
+                    block.remove_block()
+                    screen.update()
+                    # print(set(i.position() for i in exist_blocks))
+                    block.shape = random.choice(SHAPE)
+                    block.generate_block(block.shape)
+                    tm = TIME_SLEEP
         
+
+        # if beside_block(block.blocks, exist_blocks):
+        #             for i, b in enumerate(block.blocks):
+        #                 b.goto(trace_pos_list[-1][i])
+        #             trace_pos_list.append([b.position() for b in block.blocks])
+
         if any(i.ycor() >= 230 for i in exist_blocks):
             game_is_on = False
 
